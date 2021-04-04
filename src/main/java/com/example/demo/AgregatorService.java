@@ -3,19 +3,21 @@ package com.example.demo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
+import ch.qos.logback.core.joran.conditional.ElseAction;
 
 /**
  * Сервис агрегации
  * author Кузугашев В. 2021
  */
-@Component
+@Service
 public class AgregatorService {
     
-    private CustomConnector customConnector;
-    private CustomConnector customConnector2;
+    private IConnectorService customConnector;
+    private IConnectorService customConnector2;
 
-    public AgregatorService(CustomConnector customConnector, CustomConnector customConnector2){
+    public AgregatorService(CustomConnectorService customConnector, Custom2ConnectorService customConnector2){
         this.customConnector = customConnector;
         this.customConnector2= customConnector2;
     }
@@ -30,7 +32,9 @@ public class AgregatorService {
         
         CompletableFuture<Collection<Car>> _cars = this.customConnector.FindCarByAddr(addr);
         CompletableFuture<Collection<Car>> _cars2 = this.customConnector2.FindCarByAddr(addr);
+        
         CompletableFuture.allOf(_cars, _cars2).join();
+        
         Collection<Car> cars = _cars.get();
         Collection<Car> cars2 = _cars2.get();
         
@@ -53,14 +57,13 @@ public class AgregatorService {
     public Boolean Booking(String source, long carId, String phone, String addr) throws Exception { 
         
         CompletableFuture<Boolean> result=null;
-        
         if(source.equals(this.customConnector.getSource()))
             result = this.customConnector.Booking(carId, phone, addr);
         else if(source.equals(this.customConnector2.getSource()))
             result = this.customConnector2.Booking(carId, phone, addr);
         else
-            return false;
-        
+        throw new Exception("Нет источника!");
+
         CompletableFuture.allOf(result).join();
         
         return result.get();
@@ -84,7 +87,7 @@ public class AgregatorService {
         else if(source.equals(this.customConnector2.getSource()))
             result = this.customConnector2.UnBooking(carId, note);
         else
-            return false;
+            throw new Exception("Нет источника!");
 
         CompletableFuture.allOf(result).join();
 

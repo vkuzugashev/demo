@@ -6,36 +6,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * Класс возврата ошибки
  */
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class FaultResponse implements IResultResponse {
+public class FaultResponse {
 
-    private Boolean result = false;
     private String message;
 
-    @Override
-    public Boolean getResult() {
-        return result;
+    public String getResult() {
+        return "ERROR";
     }
     
-    @Override
     public String getMessage() {
         return message;
     }
     
-    @Override
-    public Object getData()
-    {
-        return null;
-    }
-
-    @Override
-    public void setData(Object data) { }
-
-    public void setMessage(String message) {
+    public FaultResponse(String message){
         this.message = message;
     }
-
-    public FaultResponse(String message) {
-        this.message = message;
-    }
-
 }

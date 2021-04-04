@@ -1,21 +1,19 @@
 package com.example.demo;
 
 import java.util.Collection;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.async.DeferredResult;
 
 /**
  * Демо приложение с демонстрацией асинхронных вызовов внешних коннекторов
@@ -51,49 +49,65 @@ public class DemoApplication {
 		this.agregatorService = agregatorService;
 	}
 	
+	/**
+	 * Главный обработчик ошибок
+	 * @param e
+	 * @return
+	 */
+	@ExceptionHandler(Exception.class)
+    public FaultResponse handleException(Exception e) {
+        return new FaultResponse(e.getMessage());
+    }
+
 	@GetMapping("/FindByAddr")
-	public IResultResponse FindByAddr(@RequestParam(value = "addr", defaultValue = "") String addr) {
-		
-		IResultResponse result;
-		Collection<Car> cars;		
+	public SuccessResponse FindByAddr(@RequestParam(name = "addr", required = true) String addr) throws Exception {
 			
 		try{
+			Collection<Car> cars;		
 			long start = System.currentTimeMillis();
 			System.out.printf("Start DemoApplication.FindCarByAddr %s\r\n", addr);	
 			cars = this.agregatorService.FindCarByAddr(addr);
 			System.out.printf("Stop DemoApplication.FindCarByAddr %s, time %d ms\r\n", addr, (System.currentTimeMillis() - start));	
-			result = new ResultResponse(cars);
+			return new SuccessResponse(cars);
 		}
 		catch(Exception e){
-			result = new FaultResponse(e.getMessage());
+			throw new Exception(e.getMessage());
 		}
-	
-		return result;
+		
 	}
 
 	@GetMapping("/Booking")
-	public IResultResponse Booking(
-		@RequestParam(value = "source", defaultValue = "") String source,
-		@RequestParam(value = "carId", defaultValue = "") Long carId,
-		@RequestParam(value = "phone", defaultValue = "") String phone,
-		@RequestParam(value = "addr", defaultValue = "") String addr
-	) {
-		Boolean result;
+	public SuccessResponse Booking(
+		@RequestParam(name = "source", required = true) String source,
+		@RequestParam(name = "carId", required = true) Long carId,
+		@RequestParam(name = "phone", required = true) String phone,
+		@RequestParam(name = "addr", required = true) String addr
+	) throws Exception {
+
 		try{
-			result = this.agregatorService.Booking(source, carId, phone, addr);
-			return new ResultResponse(result);
+			Boolean result = this.agregatorService.Booking(source, carId, phone, addr);
+			return new SuccessResponse(result);
 		}
 		catch(Exception e){
-			return new FaultResponse(e.getMessage());
+			throw new Exception(e.getMessage());
 		}
+
 	}
 
 	@GetMapping("/UnBooking")
-	public String UnBooking(
-		@RequestParam(value = "source", defaultValue = "") String source,
-		@RequestParam(value = "carId", defaultValue = "") Long carId,
-		@RequestParam(value = "note", defaultValue = "") String note		
-	) {
-		return String.format("UnBooking %s, %d, %s!", source, carId, note);		
+	public SuccessResponse UnBooking(
+		@RequestParam(name = "source", required = true) String source,
+		@RequestParam(name = "carId", required = true) Long carId,
+		@RequestParam(name = "note", required = true) String note		
+	) throws Exception {
+		
+		try{
+			Boolean result = this.agregatorService.UnBooking(source, carId, note);
+			return new SuccessResponse(result);
+		}
+		catch(Exception e){
+			throw new Exception(e.getMessage());
+		}	
+
 	}
 }

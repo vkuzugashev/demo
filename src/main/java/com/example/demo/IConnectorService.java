@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
  * Интерфейс коннектора
  * author Кузугашев В. 2021
  */
-public interface IConnector {   
+public interface IConnectorService {   
     String getSource();
     CompletableFuture<Collection<Car>> FindCarByAddr(String addr) throws InterruptedException;
     CompletableFuture<Boolean> Booking(long carId, String phone, String addr) throws InterruptedException;
