@@ -3,7 +3,10 @@ package com.example.demo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 /**
  * Сервис агрегации
@@ -12,8 +15,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class AgregatorService {
     
-    private IConnectorService customConnector;
-    private IConnectorService customConnector2;
+    private final IConnectorService customConnector;
+    private final IConnectorService customConnector2;
 
     public AgregatorService(CustomConnectorService customConnector, Custom2ConnectorService customConnector2){
         this.customConnector = customConnector;
@@ -39,7 +42,7 @@ public class AgregatorService {
         Collection<Car> allCars = new ArrayList<Car>();
         allCars.addAll(cars);        
         allCars.addAll(cars2);        
-              
+        
         return allCars;
     }
     
@@ -60,7 +63,7 @@ public class AgregatorService {
         else if(source.equals(this.customConnector2.getSource()))
             result = this.customConnector2.Booking(carId, phone, addr);
         else
-        throw new Exception("Нет источника!");
+            throw new Exception("Нет источника!");
 
         CompletableFuture.allOf(result).join();
         
@@ -91,4 +94,5 @@ public class AgregatorService {
 
         return result.get();
     }
+
 }

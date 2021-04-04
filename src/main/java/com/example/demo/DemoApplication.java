@@ -9,6 +9,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAsync(proxyTargetClass=true)
 @RequestMapping("api")
 public class DemoApplication {
-
-	private AgregatorService agregatorService;
+	
+	/**
+	 * Сервис агрегации
+	 */
+	private final AgregatorService agregatorService;
+	
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
 	}
@@ -52,60 +58,37 @@ public class DemoApplication {
 	 * @param e
 	 * @return
 	 */
-	@ExceptionHandler(Exception.class)
+	@ExceptionHandler
     public FaultResponse handleException(Exception e) {
+		System.out.printf("Exception -> %s\r\n", e.getMessage());
         return new FaultResponse(e.getMessage());
     }
 
 	@GetMapping("/FindByAddr")
 	public SuccessResponse FindByAddr(@RequestParam(name = "addr", required = true) String addr) throws Exception {
-			
-		try{
-			Collection<Car> cars;		
-			long start = System.currentTimeMillis();
-			System.out.printf("Start DemoApplication.FindCarByAddr %s\r\n", addr);	
-			cars = this.agregatorService.FindCarByAddr(addr);
-			System.out.printf("Stop DemoApplication.FindCarByAddr %s, time %d ms\r\n", addr, (System.currentTimeMillis() - start));	
-			return new SuccessResponse(cars);
-		}
-		catch(Exception e){
-			throw new Exception(e.getMessage());
-		}
 		
-	}
-
-	@GetMapping("/Booking")
-	public SuccessResponse Booking(
-		@RequestParam(name = "source", required = true) String source,
-		@RequestParam(name = "carId", required = true) Long carId,
-		@RequestParam(name = "phone", required = true) String phone,
-		@RequestParam(name = "addr", required = true) String addr
-	) throws Exception {
-
-		try{
-			Boolean result = this.agregatorService.Booking(source, carId, phone, addr);
-			return new SuccessResponse(result);
-		}
-		catch(Exception e){
-			throw new Exception(e.getMessage());
-		}
+		Collection<Car> cars;		
+		long start = System.currentTimeMillis();
+		System.out.printf("Start DemoApplication.FindCarByAddr %s\r\n", addr);	
+		cars = this.agregatorService.FindCarByAddr(addr);
+		System.out.printf("Stop DemoApplication.FindCarByAddr %s, time %d ms\r\n", addr, (System.currentTimeMillis() - start));	
+		return new SuccessResponse(cars);
 
 	}
 
-	@GetMapping("/UnBooking")
-	public SuccessResponse UnBooking(
-		@RequestParam(name = "source", required = true) String source,
-		@RequestParam(name = "carId", required = true) Long carId,
-		@RequestParam(name = "note", required = true) String note		
-	) throws Exception {
+	@PostMapping("/Booking")
+	public SuccessResponse Booking(@RequestBody(required = true) BookingRequest req) throws Exception {
 		
-		try{
-			Boolean result = this.agregatorService.UnBooking(source, carId, note);
-			return new SuccessResponse(result);
-		}
-		catch(Exception e){
-			throw new Exception(e.getMessage());
-		}	
+		Boolean result = this.agregatorService.Booking(req.getSource(), req.getCarId(), req.getPhone(), req.getAddr());
+		return new SuccessResponse(result);
+
+	}
+
+	@PostMapping("/UnBooking")
+	public SuccessResponse UnBooking(@RequestBody(required = true) UnBookingRequest req) throws Exception {
+
+		Boolean result = this.agregatorService.UnBooking(req.getSource(), req.getCarId(), req.getNote());
+		return new SuccessResponse(result);
 
 	}
 }

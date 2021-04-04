@@ -60,11 +60,13 @@ public abstract class AbstractConnectorService implements IConnectorService
      */
     @Async
     public CompletableFuture<Boolean> Booking(long carId, String phone, String addr) throws InterruptedException {
+
         System.out.printf("Start Booking %d, %s, %s\r\n", carId, phone, addr);	
         // Имитация задержки сохранения
         Thread.sleep(3000);
         System.out.printf("Stop Booking %d, %s, %s\r\n", carId, phone, addr);	
         return CompletableFuture.completedFuture(true);
+
     }
 
     /**
@@ -72,11 +74,13 @@ public abstract class AbstractConnectorService implements IConnectorService
      */
     @Async
     public CompletableFuture<Boolean> UnBooking(long carId, String note) throws InterruptedException {
+
         System.out.printf("Start UnBooking %d, %s\r\n", carId, note);			
         // Имитация задержки сохранения
         Thread.sleep(3000);
         System.out.printf("Stop UnBooking %d, %s\r\n", carId, note);	
         return CompletableFuture.completedFuture(true);		
+        
     }
 
 }

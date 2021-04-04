@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 public class CustomConnectorService extends AbstractConnectorService {
 	
 	// Для взаимедействия с внешними сервисами, тут не используется
-	private RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
 
 	public CustomConnectorService(RestTemplateBuilder restTemplateBuilder) {
 		this.restTemplate = restTemplateBuilder.build();
