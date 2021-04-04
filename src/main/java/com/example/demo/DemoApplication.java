@@ -2,8 +2,6 @@ package com.example.demo;
 
 import java.util.Collection;
 import java.util.concurrent.Executor;
-
-import org.apache.catalina.connector.Response;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

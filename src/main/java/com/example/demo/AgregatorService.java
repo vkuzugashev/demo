@@ -5,8 +5,6 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 
-import ch.qos.logback.core.joran.conditional.ElseAction;
-
 /**
  * Сервис агрегации
  * author Кузугашев В. 2021
