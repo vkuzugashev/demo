@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IConnectorService {   
     String getSource();
-    CompletableFuture<Collection<Car>> FindCarByAddr(String addr) throws InterruptedException;
+    CompletableFuture<List<Car>> FindCarByAddr(String addr) throws InterruptedException;
     CompletableFuture<Boolean> Booking(long carId, String phone, String addr) throws InterruptedException;
     CompletableFuture<Boolean> UnBooking(long carId, String note) throws InterruptedException;
 }

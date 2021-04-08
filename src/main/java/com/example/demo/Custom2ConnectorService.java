@@ -1,6 +1,5 @@
 package com.example.demo;
-
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.scheduling.annotation.Async;
@@ -24,22 +23,19 @@ public class Custom2ConnectorService extends AbstractConnectorService {
 
 
 	@Override
-	@Async
-	public CompletableFuture<Collection<Car>> FindCarByAddr(String addr) throws InterruptedException {
+	public CompletableFuture<List<Car>> FindCarByAddr(String addr) throws InterruptedException {
 		// для примера вызовем родительский метод	
 		System.out.printf("%s\r\n", Custom2ConnectorService.class);	
 		return super.FindCarByAddr(addr);
 	}
 	
 	@Override
-	@Async
 	public CompletableFuture<Boolean> Booking(long carId, String phone, String addr) throws InterruptedException {
 		//Для примера вызовем родительски метод как заглужку
 		return super.Booking(carId, phone, addr);
 	}
 	
 	@Override
-	@Async
 	public CompletableFuture<Boolean> UnBooking(long carId, String note) throws InterruptedException {
 		//Для примера вызовем родительский метод как заглужку
 		return super.UnBooking(carId, note);

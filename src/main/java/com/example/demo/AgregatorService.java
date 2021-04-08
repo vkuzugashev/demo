@@ -1,9 +1,8 @@
 package com.example.demo;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AgregatorService {
     
-    private final IConnectorService customConnector;
-    private final IConnectorService customConnector2;
-
-    public AgregatorService(CustomConnectorService customConnector, Custom2ConnectorService customConnector2){
-        this.customConnector = customConnector;
-        this.customConnector2= customConnector2;
-    }
+   
+    @Autowired
+    private IConnectorService[] connectors;
 
     /**
      * Получить список свободных машин 
@@ -29,25 +24,27 @@ public class AgregatorService {
      * @return
      * @throws Exception
      */
-    public Collection<Car> FindCarByAddr(String addr) throws Exception {
+    public List<Car> FindCarByAddr(String addr) throws Exception {
         
-        CompletableFuture<Collection<Car>> _cars = this.customConnector.FindCarByAddr(addr);
-        CompletableFuture<Collection<Car>> _cars2 = this.customConnector2.FindCarByAddr(addr);
+        List<CompletableFuture<List<Car>>> _connectors = new ArrayList<CompletableFuture<List<Car>>>();
+
+        for (IConnectorService item : connectors) {
+            _connectors.add(item.FindCarByAddr(addr));
+        }
         
-        CompletableFuture.allOf(_cars, _cars2).join();
+        CompletableFuture.allOf(_connectors.toArray(new CompletableFuture[0])).join();
         
-        Collection<Car> cars = _cars.get();
-        Collection<Car> cars2 = _cars2.get();
-        
-        Collection<Car> allCars = new ArrayList<Car>();
-        allCars.addAll(cars);        
-        allCars.addAll(cars2);        
+        List<Car> allCars = new ArrayList<Car>();
+
+        for (CompletableFuture<List<Car>> item : _connectors){
+            allCars.addAll(item.get());
+        }
         
         return allCars;
     }
     
     /**
-     * Заброниловать машину
+     * Забронировать машину
      * @param source
      * @param carId
      * @param phone
@@ -58,17 +55,17 @@ public class AgregatorService {
     public Boolean Booking(String source, long carId, String phone, String addr) throws Exception { 
         
         CompletableFuture<Boolean> result=null;
-        if(source.equals(this.customConnector.getSource()))
-            result = this.customConnector.Booking(carId, phone, addr);
-        else if(source.equals(this.customConnector2.getSource()))
-            result = this.customConnector2.Booking(carId, phone, addr);
-        else
-            throw new Exception("Нет источника!");
 
-        CompletableFuture.allOf(result).join();
+        for(IConnectorService item : connectors){
+            if(source.equals(item.getSource())){
+                result = item.Booking(carId, phone, addr);
+                CompletableFuture.allOf(result).join();
+                return result.get();
+            }
+        }
         
-        return result.get();
-
+        //Нет коннектора в списке сгенерим ошибку
+        throw new Exception("Нет источника!");
     }
 
     /**
@@ -83,16 +80,17 @@ public class AgregatorService {
         
         CompletableFuture<Boolean> result=null;
 
-        if(source.equals(this.customConnector.getSource()))
-            result = this.customConnector.UnBooking(carId, note);
-        else if(source.equals(this.customConnector2.getSource()))
-            result = this.customConnector2.UnBooking(carId, note);
-        else
-            throw new Exception("Нет источника!");
+        for(IConnectorService item : connectors){
+            if(source.equals(item.getSource())){
+                result = item.UnBooking(carId, note);
+                CompletableFuture.allOf(result).join();
+                return result.get();
+            }
+        }
+        
+        //Нет коннектора в списке сгенерим ошибку
+        throw new Exception("Нет источника!");
 
-        CompletableFuture.allOf(result).join();
-
-        return result.get();
     }
 
 }

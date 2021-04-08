@@ -1,13 +1,14 @@
 package com.example.demo;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.scheduling.annotation.Async;
 
 
 /**
- * Абстрактный базовый класс коннектора коннектора
+ * Абстрактный базовый класс коннектора
  * author Кузугашев В. 2021
  */
 public abstract class AbstractConnectorService implements IConnectorService
@@ -32,7 +33,7 @@ public abstract class AbstractConnectorService implements IConnectorService
      * Абстрактный метод нахождения списка такси по адресу
      */
     @Async
-    public CompletableFuture<Collection<Car>> FindCarByAddr(String addr) throws InterruptedException {
+    public CompletableFuture<List<Car>> FindCarByAddr(String addr) throws InterruptedException {
     
         // Должно быть что-то подобное обращение к методу REST источника
         // logger.info("Looking up " + user);
@@ -47,10 +48,13 @@ public abstract class AbstractConnectorService implements IConnectorService
         Thread.sleep(3000);
         System.out.printf("Stop FindCarByAddr %s, time %d ms\r\n", addr, (System.currentTimeMillis() - start));			
         
-        Collection<Car> cars = new ArrayList<Car>();
-        cars.add(new Car(this.source, 1L, "xxXX1xx42", "Лада2103", "8903XXXXXXXX"));
-        cars.add(new Car(this.source, 2L, "xxXX2xx42", "Лада2106", "8903XXXXXXXX"));
-        cars.add(new Car(this.source, 3L, "xxXX3xx42", "Лада2121", "8903XXXXXXXX"));
+        List<Car> cars = new ArrayList<Car>(
+            Arrays.asList(
+                new Car(this.source, 1L, "xxXX1xx42", "Лада2103", "8903XXXXXXXX"),
+                new Car(this.source, 2L, "xxXX2xx42", "Лада2106", "8903XXXXXXXX"),
+                new Car(this.source, 3L, "xxXX3xx42", "Лада2121", "8903XXXXXXXX")
+                )
+        );
 
         return CompletableFuture.completedFuture(cars);
     }

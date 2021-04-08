@@ -1,7 +1,8 @@
 package com.example.demo;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.Executor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,8 @@ public class DemoApplication {
 	/**
 	 * Сервис агрегации
 	 */
-	private final AgregatorService agregatorService;
+	@Autowired
+	private AgregatorService agregatorService;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(DemoApplication.class, args);
@@ -49,10 +51,7 @@ public class DemoApplication {
 	  return executor;
 	}
 
-	public DemoApplication(AgregatorService agregatorService){
-		this.agregatorService = agregatorService;
-	}
-	
+
 	/**
 	 * Главный обработчик ошибок
 	 * @param e
@@ -67,7 +66,7 @@ public class DemoApplication {
 	@GetMapping("/FindByAddr")
 	public SuccessResponse FindByAddr(@RequestParam(name = "addr", required = true) String addr) throws Exception {
 		
-		Collection<Car> cars;		
+		List<Car> cars;		
 		long start = System.currentTimeMillis();
 		System.out.printf("Start DemoApplication.FindCarByAddr %s\r\n", addr);	
 		cars = this.agregatorService.FindCarByAddr(addr);

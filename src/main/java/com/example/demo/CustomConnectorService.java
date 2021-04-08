@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.scheduling.annotation.Async;
@@ -25,7 +25,7 @@ public class CustomConnectorService extends AbstractConnectorService {
 
 	@Override
 	@Async
-	public CompletableFuture<Collection<Car>> FindCarByAddr(String addr) throws InterruptedException {
+	public CompletableFuture<List<Car>> FindCarByAddr(String addr) throws InterruptedException {
 		// для примера вызовем родительский метод	
 		System.out.printf("%s\r\n", CustomConnectorService.class);	
 		return super.FindCarByAddr(addr);
